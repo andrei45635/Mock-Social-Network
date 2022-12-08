@@ -9,16 +9,23 @@ import com.example.lab6_socialnetwork_gui.user_interface.UserInterface;
 import com.example.lab6_socialnetwork_gui.validators.FriendshipValidator;
 import com.example.lab6_socialnetwork_gui.validators.UserValidator;
 import com.example.lab6_socialnetwork_gui.validators.Validator;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 
 import java.io.IOException;
 
 
-public class Main {
+public class Main extends Application {
     public Main() {
     }
 
-    public static void main(String[] args) throws IOException {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        main();
+    }
+
+    public static void main() throws IOException {
         Validator<User> validator = new UserValidator();
         Validator<Friendship> friendshipValidator = new FriendshipValidator();
         UserDBRepo repo = new UserDBRepo();
