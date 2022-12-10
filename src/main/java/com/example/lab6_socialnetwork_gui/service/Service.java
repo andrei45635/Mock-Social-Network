@@ -50,6 +50,16 @@ public class Service {
     }
 
     /**
+     * Checks if a user with the given email and passwd exists in the database
+     * @param email String
+     * @param passwd String
+     * @return true if the user exists, false otherwise
+     */
+    public boolean checkUserExistsService(String email, String passwd){
+        return repo.findUser(email, passwd);
+    }
+
+    /**
      * Creates a user and adds it to the list of users
      *
      * @param ID        int

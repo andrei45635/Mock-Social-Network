@@ -6,4 +6,6 @@ module com.example.lab6_socialnetwork_gui {
 
     opens com.example.lab6_socialnetwork_gui to javafx.fxml;
     exports com.example.lab6_socialnetwork_gui;
+    exports com.example.lab6_socialnetwork_gui.controller;
+    opens com.example.lab6_socialnetwork_gui.controller to javafx.fxml;
 }

@@ -3,6 +3,7 @@ package com.example.lab6_socialnetwork_gui.repo.database;
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.repo.Repository;
+import javafx.beans.property.ReadOnlyStringProperty;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,9 +16,9 @@ import java.util.List;
 public class UserDBRepo implements Repository<Long, User> {
     private final JDBCUtils jdbcUtils = new JDBCUtils();
 
-    public UserDBRepo() {
-        this.addFriends();
-    }
+//    public UserDBRepo() {
+//        this.addFriends();
+//    }
 
     @Override
     public List<User> getAll() {
@@ -127,6 +128,23 @@ public class UserDBRepo implements Repository<Long, User> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean findUser(String email, String passwd) {
+        String query = "SELECT EXISTS (SELECT 1 FROM users WHERE email = ? AND passwd = ?)";
+        try (Connection connection = jdbcUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, email);
+            statement.setString(2, passwd);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return false;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     public List<Friendship> findFriends() {
