@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserDBRepo implements Repository<Long, User> {
     private final JDBCUtils jdbcUtils = new JDBCUtils();
@@ -130,21 +131,21 @@ public class UserDBRepo implements Repository<Long, User> {
         }
     }
 
-    public boolean findUser(String email, String passwd) {
+    public boolean findUser(String email, String passwd){
         String query = "SELECT EXISTS (SELECT 1 FROM users WHERE email = ? AND passwd = ?)";
-        try (Connection connection = jdbcUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try(Connection connection = jdbcUtils.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
             statement.setString(1, email);
             statement.setString(2, passwd);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return false;
+            if(resultSet.next() && Objects.equals(resultSet.getString(1), "t")){
+                return true;
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return true;
+        return false;
     }
 
     public List<Friendship> findFriends() {

@@ -1,6 +1,7 @@
 package com.example.lab6_socialnetwork_gui.controller;
 
 import com.example.lab6_socialnetwork_gui.HelloApplication;
+import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.service.Service;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,10 +35,11 @@ public class LoginController {
 
     @FXML
     private void onLoginPress(ActionEvent actionEvent) {
-        String email = emailTF.getText().strip();
-        String passwd = passwdTF.getText().strip();
+        String email = emailTF.getText();
+        String passwd = passwdTF.getText();
         System.out.println(email);
         System.out.println(passwd);
+        System.out.println(service.checkUserExistsService(email, passwd));
         if (!service.checkUserExistsService(email, passwd)) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Alert!");
