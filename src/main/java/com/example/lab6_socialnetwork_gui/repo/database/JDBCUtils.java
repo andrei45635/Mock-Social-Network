@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class JDBCUtils {
     private final String url = "jdbc:postgresql://localhost:5432/social_network";
     private final String user = "postgres";
-    private final String passwd = "postgres";
+    private final String passwd = "starwars4563";
 
     public Connection getConnection() {
         Connection connection = null;

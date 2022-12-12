@@ -57,13 +57,13 @@ public class RegisterController {
             alert.show();
         }
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../user-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-view.fxml"));
         Parent root1 = loader.load();
         UserViewController userViewController = loader.getController();
         userViewController.setService(service);
         for(User u: service.getAllService()){
             if(Objects.equals(u.getEmail(), email) && Objects.equals(u.getPasswd(), passwd)){
-                name = u.getFirstName() + u.getLastName();
+                name = u.getFirstName() + " " + u.getLastName();
                 break;
             }
         }

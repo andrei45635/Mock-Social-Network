@@ -15,6 +15,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 
@@ -50,19 +52,19 @@ public class LoginController {
         }
 
         String name = null;
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../user-view.fxml"));
-        Parent root1 = loader.load();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-view.fxml"));
+        Parent root = loader.load();
         UserViewController userViewController = loader.getController();
         userViewController.setService(service);
         for(User u: service.getAllService()){
             if(Objects.equals(u.getEmail(), email) && Objects.equals(u.getPasswd(), passwd)){
-                name = u.getFirstName() + u.getLastName();
+                name = u.getFirstName() + " " + u.getLastName();
                 break;
             }
         }
         userViewController.setWelcomeText(name);
         Stage stage = new Stage();
-        stage.setScene(new Scene(root1, 400, 350));
+        stage.setScene(new Scene(root, 400, 350));
         stage.setTitle("Hello!");
         stage.show();
 
@@ -75,7 +77,8 @@ public class LoginController {
         Stage thisStage = (Stage) registerButton.getScene().getWindow();
         thisStage.close();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../register-view.fxml"));
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/com/example/lab6_socialnetwork_gui/register-view.fxml"));
         Parent root1 = loader.load();
         RegisterController registerController = loader.getController();
         registerController.setService(service);
