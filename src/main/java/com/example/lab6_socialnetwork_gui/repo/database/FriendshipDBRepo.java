@@ -70,15 +70,15 @@ public class FriendshipDBRepo implements Repository<Long, Friendship> {
 
     @Override
     public Friendship save(Friendship entity) {
-        String query = "INSERT INTO friendships(idu1, idu2, date) VALUES(?,?,?)";
+        String query = "INSERT INTO friendships(idu1, idu2, date, status) VALUES(?,?,?,?)";
         try (Connection connection = jdbcUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)
         ) {
             statement.setInt(1, (int) entity.getIdU1());
             statement.setInt(2, (int) entity.getIdU2());
             statement.setTimestamp(3, Timestamp.valueOf(entity.getDate()));
+            statement.setString(4, String.valueOf(entity.getStatus()));
             statement.executeUpdate();
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

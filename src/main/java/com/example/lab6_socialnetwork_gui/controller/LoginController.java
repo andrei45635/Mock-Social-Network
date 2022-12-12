@@ -12,10 +12,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
 public class LoginController {
@@ -34,7 +34,7 @@ public class LoginController {
     }
 
     @FXML
-    private void onLoginPress(ActionEvent actionEvent) {
+    private void onLoginPress(ActionEvent actionEvent) throws IOException {
         String email = emailTF.getText();
         String passwd = passwdTF.getText();
         System.out.println(email);
@@ -48,6 +48,23 @@ public class LoginController {
             alert.show();
             return;
         }
+
+        String name = null;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../user-view.fxml"));
+        Parent root1 = loader.load();
+        UserViewController userViewController = loader.getController();
+        userViewController.setService(service);
+        for(User u: service.getAllService()){
+            if(Objects.equals(u.getEmail(), email) && Objects.equals(u.getPasswd(), passwd)){
+                name = u.getFirstName() + u.getLastName();
+                break;
+            }
+        }
+        userViewController.setWelcomeText(name);
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root1, 400, 350));
+        stage.setTitle("Hello!");
+        stage.show();
 
         Stage thisStage = (Stage) loginButton.getScene().getWindow();
         thisStage.close();

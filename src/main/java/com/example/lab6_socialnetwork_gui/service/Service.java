@@ -1,6 +1,7 @@
 package com.example.lab6_socialnetwork_gui.service;
 
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
+import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
 import com.example.lab6_socialnetwork_gui.repo.database.UserDBRepo;
@@ -129,6 +130,14 @@ public class Service {
         found1.getFriends().add(found2);
         found2.getFriends().add(found1);
         friendships.save(new Friendship(found1.getID(), found2.getID(), LocalDateTime.now()));
+    }
+
+    /**
+     * Accepts a friendship
+     * @param fr Friendship
+     */
+    public void acceptFriendship(Friendship fr){
+        fr.setStatus(FriendshipStatus.ACCEPTED);
     }
 
     /**

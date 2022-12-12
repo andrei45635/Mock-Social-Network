@@ -5,6 +5,9 @@ import com.example.lab6_socialnetwork_gui.service.Service;
 import com.example.lab6_socialnetwork_gui.validators.ValidatorException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -12,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class RegisterController {
     @FXML
@@ -34,6 +38,7 @@ public class RegisterController {
 
     @FXML
     private void onRegisterButtonPress(ActionEvent actionEvent) throws IOException {
+        String name = null;
         String firstName = firstNameTF.getText();
         String lastName = lastNameTF.getText();
         String email = emailTF.getText();
@@ -51,6 +56,23 @@ public class RegisterController {
             alert.setContentText(ve.getMessage());
             alert.show();
         }
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../user-view.fxml"));
+        Parent root1 = loader.load();
+        UserViewController userViewController = loader.getController();
+        userViewController.setService(service);
+        for(User u: service.getAllService()){
+            if(Objects.equals(u.getEmail(), email) && Objects.equals(u.getPasswd(), passwd)){
+                name = u.getFirstName() + u.getLastName();
+                break;
+            }
+        }
+        userViewController.setWelcomeText(name);
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root1, 400, 350));
+        stage.setTitle("Hello!");
+        stage.show();
+
         Stage thisStage = (Stage) registerButton.getScene().getWindow();
         thisStage.close();
     }
