@@ -8,10 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,6 +18,8 @@ import java.util.Objects;
 
 
 public class LoginController {
+    @FXML
+    private Label errorLabel;
     private Service service;
     @FXML
     private TextField emailTF;
@@ -43,25 +42,22 @@ public class LoginController {
         System.out.println(passwd);
         System.out.println(service.checkUserExistsService(email, passwd));
         if (!service.checkUserExistsService(email, passwd)) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Alert!");
-            alert.setHeaderText("Epic Fail");
-            alert.setContentText("Invalid credentials.");
-            alert.show();
+            errorLabel.setText("Invalid Credentials");
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setTitle("Alert!");
+//            alert.setHeaderText("Epic Fail");
+//            alert.setContentText("Invalid credentials.");
+//            alert.show();
             return;
         }
 
-        String name = null;
+        User loggedInUser = service.findLoggedInUser(email, passwd);
+        String name = loggedInUser.getFirstName() + " " + loggedInUser.getLastName();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-view.fxml"));
         Parent root = loader.load();
         UserViewController userViewController = loader.getController();
         userViewController.setService(service);
-        for(User u: service.getAllService()){
-            if(Objects.equals(u.getEmail(), email) && Objects.equals(u.getPasswd(), passwd)){
-                name = u.getFirstName() + " " + u.getLastName();
-                break;
-            }
-        }
         userViewController.setWelcomeText(name);
         Stage stage = new Stage();
         stage.setScene(new Scene(root, 800, 600));

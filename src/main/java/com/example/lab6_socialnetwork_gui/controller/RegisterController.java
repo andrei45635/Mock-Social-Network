@@ -38,9 +38,9 @@ public class RegisterController {
 
     @FXML
     private void onRegisterButtonPress(ActionEvent actionEvent) throws IOException {
-        String name = null;
         String firstName = firstNameTF.getText();
         String lastName = lastNameTF.getText();
+        String name = firstName + " " + lastName;
         String email = emailTF.getText();
         String passwd = passwdTF.getText();
         int age = Integer.parseInt(ageTF.getText());
@@ -61,12 +61,6 @@ public class RegisterController {
         Parent root1 = loader.load();
         UserViewController userViewController = loader.getController();
         userViewController.setService(service);
-        for(User u: service.getAllService()){
-            if(Objects.equals(u.getEmail(), email) && Objects.equals(u.getPasswd(), passwd)){
-                name = u.getFirstName() + " " + u.getLastName();
-                break;
-            }
-        }
         userViewController.setWelcomeText(name);
         Stage stage = new Stage();
         stage.setScene(new Scene(root1, 800, 600));

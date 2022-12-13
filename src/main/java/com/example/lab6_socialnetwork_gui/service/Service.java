@@ -60,6 +60,15 @@ public class Service {
         return repo.findUser(email, passwd);
     }
 
+    public User findLoggedInUser(String email, String passwd){
+        for(User u: repo.getAll()){
+            if(u.getEmail().equals(email) && u.getPasswd().equals(passwd)){
+                return u;
+            }
+        }
+        return null;
+    }
+
     /**
      * Creates a user and adds it to the list of users
      *
