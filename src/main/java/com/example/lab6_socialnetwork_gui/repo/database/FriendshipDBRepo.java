@@ -1,6 +1,7 @@
 package com.example.lab6_socialnetwork_gui.repo.database;
 
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
+import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
 import com.example.lab6_socialnetwork_gui.repo.Repository;
 
 
@@ -26,7 +27,11 @@ public class FriendshipDBRepo implements Repository<Long, Friendship> {
                 int u1ID = resultSet.getInt("idu1");
                 int u2ID = resultSet.getInt("idu2");
                 LocalDateTime date = resultSet.getTimestamp("date").toLocalDateTime();
+                FriendshipStatus status = FriendshipStatus.valueOf(resultSet.getString("status"));
                 Friendship friendship = new Friendship(u1ID, u2ID, date);
+                if (status == FriendshipStatus.ACCEPTED) {
+                    friendship.setStatus(FriendshipStatus.ACCEPTED);
+                } else friendship.setStatus(FriendshipStatus.PENDING);
                 friendList.add(friendship);
             }
         } catch (SQLException e) {
