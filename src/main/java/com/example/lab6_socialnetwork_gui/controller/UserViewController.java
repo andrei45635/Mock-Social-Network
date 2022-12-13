@@ -28,7 +28,7 @@ public class UserViewController {
     @FXML
     private Label welcomeText;
     @FXML
-    private TableView<User> friendTableView;
+    private TableView<UserDTO> friendTableView;
     @FXML
     private Button removeFriendButton;
     @FXML
