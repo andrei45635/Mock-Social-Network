@@ -43,11 +43,6 @@ public class LoginController {
         System.out.println(service.checkUserExistsService(email, passwd));
         if (!service.checkUserExistsService(email, passwd)) {
             errorLabel.setText("Invalid Credentials");
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Alert!");
-//            alert.setHeaderText("Epic Fail");
-//            alert.setContentText("Invalid credentials.");
-//            alert.show();
             return;
         }
 
