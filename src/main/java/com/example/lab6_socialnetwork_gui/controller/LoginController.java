@@ -33,9 +33,6 @@ public class LoginController {
     private void onLoginPress(ActionEvent actionEvent) throws IOException {
         String email = emailTF.getText();
         String passwd = passwdTF.getText();
-        System.out.println(email);
-        System.out.println(passwd);
-        System.out.println(service.checkUserExistsService(email, passwd));
         if (!service.checkUserExistsService(email, passwd)) {
             errorLabel.setText("Invalid Credentials");
             return;
