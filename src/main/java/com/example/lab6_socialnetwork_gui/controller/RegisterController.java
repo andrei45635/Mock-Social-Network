@@ -69,7 +69,7 @@ public class RegisterController {
         }
         userViewController.setWelcomeText(name);
         Stage stage = new Stage();
-        stage.setScene(new Scene(root1, 400, 350));
+        stage.setScene(new Scene(root1, 800, 600));
         stage.setTitle("Hello!");
         stage.show();
 
