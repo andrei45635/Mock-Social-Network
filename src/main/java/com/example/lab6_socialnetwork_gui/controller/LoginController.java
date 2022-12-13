@@ -47,7 +47,7 @@ public class LoginController {
         userViewController.setService(service);
         userViewController.setWelcomeText(name);
         Stage stage = new Stage();
-        stage.setScene(new Scene(root, 800, 600));
+        stage.setScene(new Scene(root, 600, 600));
         stage.setTitle("Hello!");
         stage.show();
 

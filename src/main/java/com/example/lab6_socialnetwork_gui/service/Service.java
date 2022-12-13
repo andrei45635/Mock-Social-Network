@@ -5,6 +5,10 @@ import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
 import com.example.lab6_socialnetwork_gui.repo.database.UserDBRepo;
+import com.example.lab6_socialnetwork_gui.utils.event.ChangeEventType;
+import com.example.lab6_socialnetwork_gui.utils.event.UserEntityChangeEvent;
+import com.example.lab6_socialnetwork_gui.utils.observer.Observable;
+import com.example.lab6_socialnetwork_gui.utils.observer.Observer;
 import com.example.lab6_socialnetwork_gui.validators.Validator;
 import com.example.lab6_socialnetwork_gui.validators.ValidatorException;
 
@@ -17,14 +21,11 @@ import java.util.Stack;
 /**
  * Service class
  */
-public class Service {
+public class Service implements Observable<UserEntityChangeEvent> {
     private final Validator<User> validator;
-    //private RepoMemoryUser repo;
-    //private UserFileRepo repo;
     private UserDBRepo repo;
     private FriendshipDBRepo friendships;
-    //private FriendshipFileRepo friendships;
-    //private FriendshipMemoryRepo friendships;
+    private List<Observer<UserEntityChangeEvent>> observers = new ArrayList<>();
 
     public Service(Validator<User> validator, UserDBRepo repo, FriendshipDBRepo friendships) {
         this.validator = validator;
@@ -84,6 +85,7 @@ public class Service {
         validator.validate(user);
         try{
             repo.save(user);
+            this.notifyObservers(new UserEntityChangeEvent(ChangeEventType.ADD, user));
         } catch (ValidatorException ve){
             System.out.println(ve.getMessage());
         }
@@ -103,6 +105,7 @@ public class Service {
             }
         }
         repo.delete(new User(ID, "a", "b", "a.com", "abcdefgha", 20));
+        this.notifyObservers(new UserEntityChangeEvent(ChangeEventType.DELETE, new User(ID, "a", "b", "a.com", "abcdefgha", 20)));
     }
 
     /**
@@ -209,5 +212,20 @@ public class Service {
             connected++;
         }
         return connected;
+    }
+
+    @Override
+    public void addObserver(Observer<UserEntityChangeEvent> observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer<UserEntityChangeEvent> observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(UserEntityChangeEvent t) {
+        observers.forEach(x -> x.update(t));
     }
 }

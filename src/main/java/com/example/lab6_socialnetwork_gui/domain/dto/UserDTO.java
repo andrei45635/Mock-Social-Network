@@ -1,5 +1,6 @@
 package com.example.lab6_socialnetwork_gui.domain.dto;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class UserDTO {
@@ -7,10 +8,13 @@ public class UserDTO {
     private String firstName;
     private String lastName;
 
-    public UserDTO(int ID, String firstName, String lastName) {
+    private LocalDateTime date;
+
+    public UserDTO(int ID, String firstName, String lastName, LocalDateTime date) {
         this.ID = ID;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.date = date;
     }
 
     public int getID() {
@@ -33,6 +37,10 @@ public class UserDTO {
         this.lastName = lastName;
     }
 
+    public LocalDateTime getDate() {
+        return date;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,6 +60,7 @@ public class UserDTO {
                 "ID=" + ID +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", date=" + date +
                 '}';
     }
 }

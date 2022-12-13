@@ -1,9 +1,13 @@
 package com.example.lab6_socialnetwork_gui.controller;
 
 import com.example.lab6_socialnetwork_gui.domain.User;
+import com.example.lab6_socialnetwork_gui.domain.dto.UserDTO;
+import com.example.lab6_socialnetwork_gui.domain.mapper.User2UserDTOMapper;
+import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
 import com.example.lab6_socialnetwork_gui.service.Service;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -12,6 +16,10 @@ public class UserViewController {
     private Tab requestsPage;
     @FXML
     private Tab mainPage;
+
+    private final ObservableList<UserDTO> userModel = FXCollections.observableArrayList();
+
+    private final User2UserDTOMapper userDTOMapper = new User2UserDTOMapper(new FriendshipDBRepo());
 
     //The service for both the user and the friendship (might refactor later)
     private Service service;
@@ -24,21 +32,21 @@ public class UserViewController {
     @FXML
     private Button removeFriendButton;
     @FXML
-    private TableColumn<User, Integer> idColumn;
+    private TableColumn<UserDTO, Integer> idColumn;
     @FXML
-    private TableColumn<User, String> firstNameColumn;
+    private TableColumn<UserDTO, String> firstNameColumn;
     @FXML
-    private TableColumn<User, String> lastNameColumn;
-    
+    private TableColumn<UserDTO, String> lastNameColumn;
+
     //The requests page, featuring all the friend requests
     @FXML
-    private TableView<User>  requestTableView;
+    private TableView<UserDTO> requestTableView;
     @FXML
-    private TableColumn<User, Integer> requestID;
+    private TableColumn<UserDTO, Integer> requestID;
     @FXML
-    private TableColumn<User, String> firstNameRequestColumn;
+    private TableColumn<UserDTO, String> firstNameRequestColumn;
     @FXML
-    private TableColumn<User, String> lastNameRequestColumn;
+    private TableColumn<UserDTO, String> lastNameRequestColumn;
     @FXML
     private TextField firstNameRequestTF;
     @FXML
@@ -52,38 +60,25 @@ public class UserViewController {
     @FXML
     private Button rejectFriendRequestButton;
 
-    public void setWelcomeText(String name){
+    public void setWelcomeText(String name) {
         welcomeText.setText("Good day, " + name);
     }
 
-    public void setService(Service service){
+    public void setService(Service service) {
         this.service = service;
     }
 
     //Method in the Main page to remove a friend the user selected in the Friends list
     @FXML
-    private void onClickRemoveFriend(ActionEvent actionEvent) {
-
-    }
-
-    //Method in the Requests page to accept a friend request
-    @FXML
-    public void onAcceptRequestPress(ActionEvent actionEvent) {
-
+    private void onRemoveFriendMainClick(ActionEvent actionEvent) {
     }
 
     //Method in the Requests page to reject a friend request
     @FXML
-    public void onRejectFriendRequestPress(ActionEvent actionEvent) {
-
+    private void onAcceptReqClick(ActionEvent actionEvent) {
     }
 
     @FXML
-    private void onMainPageSelect(Event event) {
-
-    }
-
-    @FXML
-    private void onRequestsPageSelect(Event event) {
+    private void onRejectReqClick(ActionEvent actionEvent) {
     }
 }
