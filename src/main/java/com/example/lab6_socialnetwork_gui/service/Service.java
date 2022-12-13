@@ -53,35 +53,36 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Checks if a user with the given email and passwd exists in the database
-     * @param email String
+     *
+     * @param email  String
      * @param passwd String
      * @return true if the user exists, false otherwise
      */
-    public boolean checkUserExistsService(String email, String passwd){
+    public boolean checkUserExistsService(String email, String passwd) {
         return repo.findUser(email, passwd);
     }
 
-    public User findOneService(int id){
+    public User findOneService(int id) {
         return repo.findOne(id);
     }
 
-    public void findUserFriends(User loggedInUser){
-        for(Friendship fr: friendships.getAll()){
-            if(loggedInUser.getID() == fr.getIdU1()){
+    public void findUserFriends(User loggedInUser) {
+        for (Friendship fr : friendships.getAll()) {
+            if (loggedInUser.getID() == fr.getIdU1()) {
                 System.out.println(loggedInUser);
                 User friend = repo.findOne((int) fr.getIdU2());
                 System.out.println(friend);
                 loggedInUser.getFriends().add(friend);
-            } else if(loggedInUser.getID() == fr.getIdU2()){
+            } else if (loggedInUser.getID() == fr.getIdU2()) {
                 User friend = repo.findOne((int) fr.getIdU1());
                 loggedInUser.getFriends().add(friend);
             }
         }
     }
 
-    public User findLoggedInUser(String email, String passwd){
-        for(User u: repo.getAll()){
-            if(u.getEmail().equals(email) && u.getPasswd().equals(passwd)){
+    public User findLoggedInUser(String email, String passwd) {
+        for (User u : repo.getAll()) {
+            if (u.getEmail().equals(email) && u.getPasswd().equals(passwd)) {
                 return u;
             }
         }
@@ -101,10 +102,10 @@ public class Service implements Observable<UserEntityChangeEvent> {
     public void addUserService(int ID, String firstName, String lastName, String email, String passwd, int age) throws IOException {
         User user = new User(ID, firstName, lastName, email, passwd, age);
         validator.validate(user);
-        try{
+        try {
             repo.save(user);
             this.notifyObservers(new UserEntityChangeEvent(ChangeEventType.ADD, user));
-        } catch (ValidatorException ve){
+        } catch (ValidatorException ve) {
             System.out.println(ve.getMessage());
         }
     }
@@ -115,9 +116,9 @@ public class Service implements Observable<UserEntityChangeEvent> {
      * @param ID int
      */
     public void deleteUserService(int ID) throws IOException {
-        for(User u: repo.getAll()){
-            for(Friendship fr: friendships.getAll()){
-                if((fr.getIdU1() == u.getID() || fr.getIdU2() == u.getID()) && u.getID() == ID){
+        for (User u : repo.getAll()) {
+            for (Friendship fr : friendships.getAll()) {
+                if ((fr.getIdU1() == u.getID() || fr.getIdU2() == u.getID()) && u.getID() == ID) {
                     friendships.delete(fr);
                 }
             }
@@ -164,10 +165,12 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Accepts a friendship
+     *
      * @param fr Friendship
      */
-    public void acceptFriendship(Friendship fr){
+    public void acceptFriendship(Friendship fr) {
         fr.setStatus(FriendshipStatus.ACCEPTED);
+        friendships.update(fr);
     }
 
     /**
@@ -176,7 +179,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
      * @param ID   int, user 1
      * @param ID2, int user 2
      */
-    public void deleteFriendService(int ID, int ID2) throws IOException{
+    public void deleteFriendService(int ID, int ID2) throws IOException {
         User found1 = null;
         User found2 = null;
         for (User u : repo.getAll()) {

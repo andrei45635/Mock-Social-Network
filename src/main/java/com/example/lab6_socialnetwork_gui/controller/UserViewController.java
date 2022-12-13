@@ -101,7 +101,13 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private void onRemoveFriendClick(ActionEvent actionEvent) throws IOException {
         UserDTO user = friendsTableView.getSelectionModel().getSelectedItem();
         if (user != null) {
-            service.deleteUserService(user.getID());
+            for(Friendship fr: service.getAllFriendsService()) {
+                if (user.getID() == fr.getIdU1()) {
+                    service.deleteFriendService(user.getID(), (int) fr.getIdU2());
+                } else if (user.getID() == fr.getIdU2()) {
+                    service.deleteFriendService((int) fr.getIdU1(), user.getID());
+                }
+            }
         }
     }
 
@@ -112,6 +118,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
             for(Friendship fr: service.getAllFriendsService()){
                 if(user.getID() == fr.getIdU1() || user.getID() == fr.getIdU2()){
                     service.acceptFriendship(fr);
+                    requestsTableView.getItems().remove(user);
+                    break;
                 }
             }
         }
@@ -189,9 +197,11 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         for(User u: users){
             for(Friendship fr: friendships){
                 if(u.getID() == loggedInUser.getID() && loggedInUser.getID() == fr.getIdU1() && fr.getStatus() == FriendshipStatus.PENDING){
-                    requests.add(u);
+                    User friend = service.findOneService((int) fr.getIdU2());
+                    requests.add(friend);
                 } else if (u.getID() == loggedInUser.getID() && loggedInUser.getID() == fr.getIdU2() && fr.getStatus() == FriendshipStatus.PENDING){
-                    requests.add(u);
+                    User friend = service.findOneService((int) fr.getIdU1());
+                    requests.add(friend);
                 }
             }
         }
@@ -205,7 +215,16 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
 
     private void initModel() {
         service.findUserFriends(loggedInUser);
-        List<User> friends = new ArrayList<>(loggedInUser.getFriends());
+        List<User> friends = new ArrayList<>();
+        for(Friendship fr: service.getAllFriendsService()){
+            if(fr.getIdU1() == loggedInUser.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED){
+                User friend = service.findOneService((int) fr.getIdU2());
+                friends.add(friend);
+            } else if(fr.getIdU2() == loggedInUser.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED){
+                User friend = service.findOneService((int) fr.getIdU1());
+                friends.add(friend);
+            }
+        }
         friendsModel.setAll(userDTOMapper.convert(friends));
     }
 
