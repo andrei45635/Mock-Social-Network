@@ -61,6 +61,24 @@ public class Service implements Observable<UserEntityChangeEvent> {
         return repo.findUser(email, passwd);
     }
 
+    public User findOneService(int id){
+        return repo.findOne(id);
+    }
+
+    public void findUserFriends(User loggedInUser){
+        for(Friendship fr: friendships.getAll()){
+            if(loggedInUser.getID() == fr.getIdU1()){
+                System.out.println(loggedInUser);
+                User friend = repo.findOne((int) fr.getIdU2());
+                System.out.println(friend);
+                loggedInUser.getFriends().add(friend);
+            } else if(loggedInUser.getID() == fr.getIdU2()){
+                User friend = repo.findOne((int) fr.getIdU1());
+                loggedInUser.getFriends().add(friend);
+            }
+        }
+    }
+
     public User findLoggedInUser(String email, String passwd){
         for(User u: repo.getAll()){
             if(u.getEmail().equals(email) && u.getPasswd().equals(passwd)){

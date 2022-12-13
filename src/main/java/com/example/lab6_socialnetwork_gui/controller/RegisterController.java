@@ -56,7 +56,7 @@ public class RegisterController {
             alert.show();
         }
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-friends-view.fxml"));
         Parent root1 = loader.load();
         UserViewController userViewController = loader.getController();
         userViewController.setService(service);

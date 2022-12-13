@@ -41,11 +41,13 @@ public class LoginController {
         User loggedInUser = service.findLoggedInUser(email, passwd);
         String name = loggedInUser.getFirstName() + " " + loggedInUser.getLastName();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-friends-view.fxml"));
         Parent root = loader.load();
         UserViewController userViewController = loader.getController();
+        userViewController.setLoggedInUser(loggedInUser);
         userViewController.setService(service);
         userViewController.setWelcomeText(name);
+        System.out.println();
         Stage stage = new Stage();
         stage.setScene(new Scene(root, 600, 600));
         stage.setTitle("Hello!");
