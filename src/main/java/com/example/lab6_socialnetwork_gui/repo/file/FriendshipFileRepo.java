@@ -3,7 +3,6 @@ package com.example.lab6_socialnetwork_gui.repo.file;
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.validators.Validator;
 
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;

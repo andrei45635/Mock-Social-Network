@@ -3,7 +3,6 @@ package com.example.lab6_socialnetwork_gui.repo.database;
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.repo.Repository;
-import javafx.beans.property.ReadOnlyStringProperty;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

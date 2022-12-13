@@ -1,6 +1,5 @@
 package com.example.lab6_socialnetwork_gui.controller;
 
-import com.example.lab6_socialnetwork_gui.HelloApplication;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.service.Service;
 import javafx.event.ActionEvent;
@@ -12,10 +11,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Objects;
-
 
 public class LoginController {
     @FXML

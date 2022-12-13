@@ -4,7 +4,6 @@ import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
 import com.example.lab6_socialnetwork_gui.repo.Repository;
 
-
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
