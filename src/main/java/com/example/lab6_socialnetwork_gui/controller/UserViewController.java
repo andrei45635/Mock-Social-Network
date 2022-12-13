@@ -18,8 +18,10 @@ public class UserViewController {
     private Tab requestsPage;
     @FXML
     private Tab mainPage;
+
     //The service for both the user and the friendship (might refactor later)
     private Service service;
+
     // The main page, featuring all the logged-in user's friends
     @FXML
     private Label welcomeText;
