@@ -1,9 +1,12 @@
 package com.example.lab6_socialnetwork_gui.controller;
 
 import com.example.lab6_socialnetwork_gui.domain.User;
-import com.example.lab6_socialnetwork_gui.domain.dto.UserDTO;
-import com.example.lab6_socialnetwork_gui.domain.mapper.User2UserDTOMapper;
+import com.example.lab6_socialnetwork_gui.dto.FriendUserDTO;
+import com.example.lab6_socialnetwork_gui.dto.UserDTO;
+import com.example.lab6_socialnetwork_gui.mapper.User2FriendUserDTOMapper;
+import com.example.lab6_socialnetwork_gui.mapper.User2UserDTOMapper;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
+import com.example.lab6_socialnetwork_gui.repo.database.UserDBRepo;
 import com.example.lab6_socialnetwork_gui.service.Service;
 import com.example.lab6_socialnetwork_gui.utils.event.UserEntityChangeEvent;
 import com.example.lab6_socialnetwork_gui.utils.observer.Observer;
@@ -14,15 +17,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class UserViewController implements Observer<UserEntityChangeEvent> {
+    //Table Views
     @FXML
     private TableView<UserDTO> friendsTableView;
     @FXML
     private TableView<UserDTO> requestsTableView;
+    @FXML
+    private TableView<FriendUserDTO> searchFriendTableView;
 
     //Service (might refactor later)
     private Service service;
@@ -32,7 +41,11 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
 
     private final ObservableList<UserDTO> friendsModel = FXCollections.observableArrayList();
 
+    private final ObservableList<FriendUserDTO> searchFriendsModel = FXCollections.observableArrayList();
+
     private final User2UserDTOMapper userDTOMapper = new User2UserDTOMapper(new FriendshipDBRepo());
+
+    private final User2FriendUserDTOMapper user2FriendUserDTOMapper = new User2FriendUserDTOMapper();
 
     //Main page featuring the friends of the logged-in user
     @FXML
@@ -66,8 +79,26 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
     private Button rejectFriendRequestButton;
 
+    //Search page featuring the list of filtered users by the first and last names
     @FXML
-    private void onRemoveFriendClick(ActionEvent actionEvent) {
+    private TableColumn<FriendUserDTO, Integer> searchIDColumn;
+    @FXML
+    private TableColumn<FriendUserDTO, String> searchFirstNameColumn;
+    @FXML
+    private TableColumn<FriendUserDTO, String> searchLastNameColumn;
+    @FXML
+    private Button sendFriendReqButton;
+    @FXML
+    private TextField searchFirstNameTF;
+    @FXML
+    private TextField searchLastNameTF;
+
+    @FXML
+    private void onRemoveFriendClick(ActionEvent actionEvent) throws IOException {
+        UserDTO user = friendsTableView.getSelectionModel().getSelectedItem();
+        if (user != null) {
+            service.deleteUserService(user.getID());
+        }
     }
 
     @FXML
@@ -78,32 +109,50 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private void onRejectReqClick(ActionEvent actionEvent) {
     }
 
+    @FXML
+    private void onSendFriendReqClick(ActionEvent actionEvent) {
+
+    }
+
     @Override
     public void update(UserEntityChangeEvent userEntityChangeEvent) {
         initModel();
+        initSearchModel();
     }
 
     public void setService(Service service) {
         this.service = service;
         service.addObserver(this);
         initModel();
+        initSearchModel();
     }
 
     @FXML
-    public void initialize(){
+    public void initialize() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("First Name"));
-        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("Last Name"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("Date"));
+        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         friendsTableView.setItems(friendsModel);
+
+        searchIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        searchFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        searchLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+
+        searchFriendTableView.setItems(searchFriendsModel);
+
+        searchFirstNameTF.textProperty().addListener(f -> userFilters());
+        searchLastNameTF.textProperty().addListener(f -> userFilters());
+    }
+
+    public void initSearchModel(){
+        List<User> users = new ArrayList<>(service.getAllService());
+        searchFriendsModel.setAll(user2FriendUserDTOMapper.convert(users));
     }
 
     private void initModel() {
         service.findUserFriends(loggedInUser);
-        for(User u: loggedInUser.getFriends()){
-            System.out.println(u);
-        }
         List<User> friends = new ArrayList<>(loggedInUser.getFriends());
         friendsModel.setAll(userDTOMapper.convert(friends));
     }
@@ -113,7 +162,17 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     }
 
     public void setLoggedInUser(User loggedInUser) {
-        System.out.println(loggedInUser);
         this.loggedInUser = loggedInUser;
+    }
+
+    private void userFilters(){
+        String firstName = searchFirstNameColumn.getText();
+        String lastName = searchLastNameTF.getText();
+        Predicate<FriendUserDTO> firstNamePredicate = friendUserDTO -> friendUserDTO.getFirstName().contains(firstName);
+        Predicate<FriendUserDTO> lastNamePredicate = friendUserDTO -> friendUserDTO.getLastName().contains(lastName);
+        Predicate<FriendUserDTO> predicateResult = firstNamePredicate.or(lastNamePredicate);
+        List<User> users = service.getAllService();
+        List<FriendUserDTO> friendUsers = user2FriendUserDTOMapper.convert(users);
+        searchFriendsModel.setAll(friendUsers.stream().filter(predicateResult).collect(Collectors.toList()));
     }
 }

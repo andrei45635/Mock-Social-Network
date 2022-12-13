@@ -1,4 +1,4 @@
-package com.example.lab6_socialnetwork_gui.domain.dto;
+package com.example.lab6_socialnetwork_gui.dto;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -7,7 +7,6 @@ public class UserDTO {
     private final int ID;
     private String firstName;
     private String lastName;
-
     private LocalDateTime date;
 
     public UserDTO(int ID, String firstName, String lastName, LocalDateTime date) {

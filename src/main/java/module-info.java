@@ -4,8 +4,10 @@ module com.example.lab6_socialnetwork_gui {
     requires java.sql;
 
 
-    opens com.example.lab6_socialnetwork_gui to javafx.fxml;
+    opens com.example.lab6_socialnetwork_gui to javafx.graphics, javafx.fxml, javafx.base;
+    opens com.example.lab6_socialnetwork_gui.dto to javafx.graphics, javafx.fxml, javafx.base;
+    opens com.example.lab6_socialnetwork_gui.controller to javafx.graphics, javafx.fxml, javafx.base;
+
     exports com.example.lab6_socialnetwork_gui;
     exports com.example.lab6_socialnetwork_gui.controller;
-    opens com.example.lab6_socialnetwork_gui.controller to javafx.fxml;
 }

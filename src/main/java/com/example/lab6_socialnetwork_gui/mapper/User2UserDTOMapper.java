@@ -1,8 +1,8 @@
-package com.example.lab6_socialnetwork_gui.domain.mapper;
+package com.example.lab6_socialnetwork_gui.mapper;
 
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.domain.User;
-import com.example.lab6_socialnetwork_gui.domain.dto.UserDTO;
+import com.example.lab6_socialnetwork_gui.dto.UserDTO;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
 
 import java.util.ArrayList;
