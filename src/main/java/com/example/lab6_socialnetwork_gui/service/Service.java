@@ -35,7 +35,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns a list with all the users
-     *
      * @return List of Users
      */
     public List<User> getAllService() {
@@ -44,7 +43,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns a list with all the friends
-     *
      * @return List of Friends
      */
     public List<Friendship> getAllFriendsService() {
@@ -53,7 +51,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Checks if a user with the given email and passwd exists in the database
-     *
      * @param email  String
      * @param passwd String
      * @return true if the user exists, false otherwise
@@ -62,10 +59,37 @@ public class Service implements Observable<UserEntityChangeEvent> {
         return repo.findUser(email, passwd);
     }
 
+    /**
+     * Returns a User based on the ID
+     * @param id int
+     * @return the User if the ID is valid, null otherwise
+     */
     public User findOneService(int id) {
         return repo.findOne(id);
     }
 
+    /**
+     * Checks if two users are friends
+     * @param u1 user 1
+     * @param u2 user 2
+     * @return true if the users are friends, false otherwise
+     */
+    public boolean isFriendsWith(User u1, User u2){
+        for(Friendship fr: friendships.getAll()){
+            if(fr.getIdU1() == u1.getID() && fr.getIdU2() == u2.getID()){
+                return true;
+            } else if(fr.getIdU1() == u2.getID() && fr.getIdU2() == u1.getID()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Finds all the friends of a user
+     * loggeInUser.getFriends() (the list of friends) is filled with the friends of the aforementioned user
+     * @param loggedInUser the user
+     */
     public void findUserFriends(User loggedInUser) {
         for (Friendship fr : friendships.getAll()) {
             if (loggedInUser.getID() == fr.getIdU1()) {
@@ -80,6 +104,12 @@ public class Service implements Observable<UserEntityChangeEvent> {
         }
     }
 
+    /**
+     * Finds a user based on their email and password
+     * @param email String
+     * @param passwd String
+     * @return the User or null if the email and password don't exist
+     */
     public User findLoggedInUser(String email, String passwd) {
         for (User u : repo.getAll()) {
             if (u.getEmail().equals(email) && u.getPasswd().equals(passwd)) {
@@ -129,7 +159,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * The user with the ID ID becomes friends with the user with the ID ID2
-     *
      * @param ID  int, user 1
      * @param ID2 int, user 2
      */
@@ -165,7 +194,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Accepts a friendship
-     *
      * @param fr Friendship
      */
     public void acceptFriendship(Friendship fr) {
@@ -175,7 +203,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * The user with the ID ID removes his friendship with the user with the ID ID2
-     *
      * @param ID   int, user 1
      * @param ID2, int user 2
      */
@@ -203,7 +230,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * DFS on a copy of the List of users
-     *
      * @param copy List of users
      */
     public void DFS(List<User> copy) {
@@ -222,7 +248,6 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns the number of connected components in the network
-     *
      * @return int, the number of connected components
      */
     public int connectedCommunities() {

@@ -42,6 +42,7 @@ public class RegisterController {
         String name = firstName + " " + lastName;
         String email = emailTF.getText();
         String passwd = passwdTF.getText();
+        User loggedInUser;
         int age = Integer.parseInt(ageTF.getText());
         List<User> users = service.getAllService();
         int lastID = users.get(users.size() - 1).getID();
@@ -55,10 +56,11 @@ public class RegisterController {
             alert.setContentText(ve.getMessage());
             alert.show();
         }
-
+        loggedInUser = service.findOneService(lastID + 1);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/user-friends-view.fxml"));
         Parent root1 = loader.load();
         UserViewController userViewController = loader.getController();
+        userViewController.setLoggedInUser(loggedInUser);
         userViewController.setService(service);
         userViewController.setWelcomeText(name);
         Stage stage = new Stage();

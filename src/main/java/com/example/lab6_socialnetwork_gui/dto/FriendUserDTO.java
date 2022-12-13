@@ -1,6 +1,5 @@
 package com.example.lab6_socialnetwork_gui.dto;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class FriendUserDTO {
@@ -22,16 +21,8 @@ public class FriendUserDTO {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     @Override

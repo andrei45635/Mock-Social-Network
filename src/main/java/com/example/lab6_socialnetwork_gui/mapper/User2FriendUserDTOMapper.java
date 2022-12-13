@@ -2,7 +2,6 @@ package com.example.lab6_socialnetwork_gui.mapper;
 
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.dto.FriendUserDTO;
-import com.example.lab6_socialnetwork_gui.repo.database.UserDBRepo;
 
 import java.util.ArrayList;
 import java.util.List;

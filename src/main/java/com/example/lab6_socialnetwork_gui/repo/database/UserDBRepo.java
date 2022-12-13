@@ -16,10 +16,6 @@ import java.util.Objects;
 public class UserDBRepo implements Repository<Long, User> {
     private final JDBCUtils jdbcUtils = new JDBCUtils();
 
-//    public UserDBRepo() {
-//        this.addFriends();
-//    }
-
     @Override
     public List<User> getAll() {
         List<User> userList = new ArrayList<>();
@@ -66,7 +62,7 @@ public class UserDBRepo implements Repository<Long, User> {
     public User update(User entity) {
         String query = "UPDATE users SET firstName = ?, lastName = ?, email = ?, passwd = ?, age = ? WHERE id = ?";
         try (Connection connection = jdbcUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
+             PreparedStatement statement = connection.prepareStatement(query)
         ) {
             statement.setString(1, entity.getFirstName());
             statement.setString(2, entity.getLastName());
@@ -100,20 +96,6 @@ public class UserDBRepo implements Repository<Long, User> {
             throw new RuntimeException(e);
         }
         return entity;
-    }
-
-    public void addFriends() {
-        for (User u : this.getAll()) {
-            for (Friendship fr : this.findFriends()) {
-                if (u.getID() == fr.getIdU1()) {
-                    User friend = findOne((int) fr.getIdU2());
-                    u.getFriends().add(friend);
-                } else if (u.getID() == fr.getIdU2()) {
-                    User friend = findOne((int) fr.getIdU1());
-                    u.getFriends().add(friend);
-                }
-            }
-        }
     }
 
     public User findOne(int id) {
