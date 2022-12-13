@@ -1,5 +1,7 @@
 package com.example.lab6_socialnetwork_gui.controller;
 
+import com.example.lab6_socialnetwork_gui.domain.Friendship;
+import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.dto.FriendUserDTO;
 import com.example.lab6_socialnetwork_gui.dto.UserDTO;
@@ -42,6 +44,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private final ObservableList<UserDTO> friendsModel = FXCollections.observableArrayList();
 
     private final ObservableList<FriendUserDTO> searchFriendsModel = FXCollections.observableArrayList();
+
+    private final ObservableList<UserDTO> friendRequestModel = FXCollections.observableArrayList();
 
     private final User2UserDTOMapper userDTOMapper = new User2UserDTOMapper(new FriendshipDBRepo());
 
@@ -103,21 +107,43 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
 
     @FXML
     private void onAcceptFriendReqClick(ActionEvent actionEvent) {
+        UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
+        if(user != null){
+            for(Friendship fr: service.getAllFriendsService()){
+                if(user.getID() == fr.getIdU1() || user.getID() == fr.getIdU2()){
+                    service.acceptFriendship(fr);
+                }
+            }
+        }
     }
 
     @FXML
-    private void onRejectReqClick(ActionEvent actionEvent) {
+    private void onRejectReqClick(ActionEvent actionEvent) throws IOException {
+        UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
+        if(user != null){
+            for(Friendship fr: service.getAllFriendsService()){
+                if(user.getID() == fr.getIdU1()){
+                    service.deleteFriendService((int) fr.getIdU1(), user.getID());
+                } else if(user.getID() == fr.getIdU2()){
+                    service.deleteFriendService(user.getID(), (int) fr.getIdU2());
+                }
+            }
+        }
     }
 
     @FXML
-    private void onSendFriendReqClick(ActionEvent actionEvent) {
-
+    private void onSendFriendReqClick(ActionEvent actionEvent) throws IOException {
+        FriendUserDTO user = searchFriendTableView.getSelectionModel().getSelectedItem();
+        if(user != null){
+            service.addFriendService(loggedInUser.getID(), user.getID());
+        }
     }
 
     @Override
     public void update(UserEntityChangeEvent userEntityChangeEvent) {
         initModel();
         initSearchModel();
+        initRequestsModel();
     }
 
     public void setService(Service service) {
@@ -125,6 +151,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         service.addObserver(this);
         initModel();
         initSearchModel();
+        initRequestsModel();
     }
 
     @FXML
@@ -136,6 +163,15 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
 
         friendsTableView.setItems(friendsModel);
 
+        reqIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        reqFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        reqLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        reqDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        requestsTableView.setItems(friendRequestModel);
+        firstNameTF.textProperty().addListener(f -> userFilters());
+        lastNameTF.textProperty().addListener(f -> userFilters());
+
         searchIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
         searchFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         searchLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
@@ -144,6 +180,22 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
 
         searchFirstNameTF.textProperty().addListener(f -> userFilters());
         searchLastNameTF.textProperty().addListener(f -> userFilters());
+    }
+
+    public void initRequestsModel(){
+        List<User> users = service.getAllService();
+        List<Friendship> friendships = service.getAllFriendsService();
+        List<User> requests = new ArrayList<>();
+        for(User u: users){
+            for(Friendship fr: friendships){
+                if(u.getID() == loggedInUser.getID() && loggedInUser.getID() == fr.getIdU1() && fr.getStatus() == FriendshipStatus.PENDING){
+                    requests.add(u);
+                } else if (u.getID() == loggedInUser.getID() && loggedInUser.getID() == fr.getIdU2() && fr.getStatus() == FriendshipStatus.PENDING){
+                    requests.add(u);
+                }
+            }
+        }
+        friendRequestModel.setAll(userDTOMapper.convert(requests));
     }
 
     public void initSearchModel(){
