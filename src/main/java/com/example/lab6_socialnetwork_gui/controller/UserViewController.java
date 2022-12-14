@@ -34,7 +34,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
     private TableView<FriendUserDTO> searchFriendTableView;
 
-    //Service (might refactor later)
+    //Service
     private Service service;
 
     //The logged-in user
@@ -100,6 +100,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
                 }
             }
         }
+        initModel();
+        initSearchModel();
     }
 
     @FXML
@@ -117,6 +119,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
             }
         }
         initModel();
+        initSearchModel();
     }
 
     @FXML
@@ -125,14 +128,15 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         if (user != null) {
             for (Friendship fr : service.getAllFriendsService()) {
                 if (user.getID() == fr.getIdU1()) {
-                    service.deleteFriendService((int) fr.getIdU1(), user.getID());
+                    service.deleteFriendService(user.getID(), (int) fr.getIdU2());
                     requestsTableView.getItems().remove(user);
                 } else if (user.getID() == fr.getIdU2()) {
-                    service.deleteFriendService(user.getID(), (int) fr.getIdU2());
+                    service.deleteFriendService((int) fr.getIdU1(), user.getID());
                     requestsTableView.getItems().remove(user);
                 }
             }
         }
+        initSearchModel();
     }
 
     @FXML

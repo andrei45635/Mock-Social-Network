@@ -225,7 +225,11 @@ public class Service implements Observable<UserEntityChangeEvent> {
         found1.getFriends().remove(found2);
         assert found2 != null;
         found2.getFriends().remove(found1);
-        friendships.delete(new Friendship(found1.getID(), found2.getID(), LocalDateTime.now()));
+        for(Friendship fr: friendships.getAll()){
+            if(fr.getIdU1() == ID && fr.getIdU2() == ID2){
+                friendships.delete(fr);
+            }
+        }
     }
 
     /**
