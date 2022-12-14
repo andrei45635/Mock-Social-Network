@@ -6,6 +6,7 @@ module com.example.lab6_socialnetwork_gui {
 
     opens com.example.lab6_socialnetwork_gui to javafx.graphics, javafx.fxml, javafx.base;
     opens com.example.lab6_socialnetwork_gui.dto to javafx.graphics, javafx.fxml, javafx.base;
+    opens com.example.lab6_socialnetwork_gui.domain to javafx.graphics, javafx.fxml, javafx.base;
     opens com.example.lab6_socialnetwork_gui.controller to javafx.graphics, javafx.fxml, javafx.base;
 
     exports com.example.lab6_socialnetwork_gui;

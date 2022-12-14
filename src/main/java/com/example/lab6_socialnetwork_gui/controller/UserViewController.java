@@ -60,6 +60,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
     private TableColumn<UserDTO, LocalDateTime> dateColumn;
     @FXML
+    private TableColumn<UserDTO, FriendshipStatus> friendStatusColumn;
+    @FXML
     private Label welcomeText;
 
     //Requests page featuring the logged-in user's requests
@@ -71,6 +73,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private TableColumn<UserDTO, String> reqLastNameColumn;
     @FXML
     private TableColumn<UserDTO, LocalDateTime> reqDateColumn;
+    @FXML
+    private TableColumn<UserDTO, FriendshipStatus> requestStatusColumn;
     @FXML
     private TextField firstNameTF;
     @FXML
@@ -93,10 +97,11 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         UserDTO user = friendsTableView.getSelectionModel().getSelectedItem();
         if (user != null) {
             for (Friendship fr : service.getAllFriendsService()) {
-                if (user.getID() == fr.getIdU1()) {
-                    service.deleteFriendService(user.getID(), (int) fr.getIdU2());
-                } else if (user.getID() == fr.getIdU2()) {
-                    service.deleteFriendService((int) fr.getIdU1(), user.getID());
+                if (user.getID() == fr.getIdU1() && loggedInUser.getID() == fr.getIdU2()) {
+                    service.deleteFriendService(user.getID(), loggedInUser.getID());
+                    System.out.println("remove");
+                } else if (user.getID() == fr.getIdU2() && loggedInUser.getID() == fr.getIdU1()) {
+                    service.deleteFriendService(loggedInUser.getID(), user.getID());
                 }
             }
         }
@@ -109,33 +114,32 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
         if (user != null) {
             for (Friendship fr : service.getAllFriendsService()) {
-                if (user.getID() == fr.getIdU1()) {
+                if (user.getID() == fr.getIdU1() && loggedInUser.getID() == fr.getIdU2()) {
                     service.acceptFriendship(fr);
-                    requestsTableView.getItems().remove(user);
-                } else if (user.getID() == fr.getIdU2()) {
+                } else if (user.getID() == fr.getIdU2() && loggedInUser.getID() == fr.getIdU1()) {
                     service.acceptFriendship(fr);
-                    requestsTableView.getItems().remove(user);
                 }
             }
         }
         initModel();
         initSearchModel();
+        initRequestsModel();
     }
 
     @FXML
     private void onRejectReqClick(ActionEvent actionEvent) throws IOException {
         UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
+        System.out.println(user);
         if (user != null) {
             for (Friendship fr : service.getAllFriendsService()) {
-                if (user.getID() == fr.getIdU1()) {
-                    service.deleteFriendService(user.getID(), (int) fr.getIdU2());
-                    requestsTableView.getItems().remove(user);
-                } else if (user.getID() == fr.getIdU2()) {
-                    service.deleteFriendService((int) fr.getIdU1(), user.getID());
-                    requestsTableView.getItems().remove(user);
+                if (user.getID() == fr.getIdU1() && loggedInUser.getID() == fr.getIdU2()) {
+                    service.deleteFriendService(user.getID(), loggedInUser.getID());
+                } else if (user.getID() == fr.getIdU2() && loggedInUser.getID() == fr.getIdU1()) {
+                    service.deleteFriendService(loggedInUser.getID(), user.getID());
                 }
             }
         }
+        initRequestsModel();
         initSearchModel();
     }
 
@@ -145,6 +149,16 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         if (user != null) {
             service.addFriendService(loggedInUser.getID(), user.getID());
         }
+        if(user != null){
+            for(Friendship fr: service.getAllFriendsService()){
+                if(loggedInUser.getID() == fr.getIdU1() && user.getID() == fr.getIdU2()){
+                    fr.setStatus(FriendshipStatus.PENDING);
+                } else if(loggedInUser.getID() == fr.getIdU2() && user.getID() == fr.getIdU1()){
+                    fr.setStatus(FriendshipStatus.PENDING);
+                }
+            }
+        }
+        initSearchModel();
     }
 
     @Override
@@ -168,13 +182,16 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        friendStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         friendsTableView.setItems(friendsModel);
 
         reqIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
         reqFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        System.out.println("random");
         reqLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         reqDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        requestStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         requestsTableView.setItems(friendRequestModel);
         firstNameTF.textProperty().addListener(f -> userFilters());
@@ -193,19 +210,23 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     public void initRequestsModel() {
         List<User> users = service.getAllService();
         List<Friendship> friendships = service.getAllFriendsService();
-        List<User> requests = new ArrayList<>();
+        List<UserDTO> friendDTOS = new ArrayList<>();
         for (User u : users) {
             for (Friendship fr : friendships) {
                 if (u.getID() == loggedInUser.getID() && loggedInUser.getID() == fr.getIdU1() && fr.getStatus() == FriendshipStatus.PENDING) {
                     User friend = service.findOneService((int) fr.getIdU2());
-                    requests.add(friend);
+                    UserDTO friendDTO = userDTOMapper.convert(friend);
+                    friendDTO.setStatus(FriendshipStatus.PENDING);
+                    friendDTOS.add(friendDTO);
                 } else if (u.getID() == loggedInUser.getID() && loggedInUser.getID() == fr.getIdU2() && fr.getStatus() == FriendshipStatus.PENDING) {
                     User friend = service.findOneService((int) fr.getIdU1());
-                    requests.add(friend);
+                    UserDTO friendDTO = userDTOMapper.convert(friend);
+                    friendDTO.setStatus(FriendshipStatus.PENDING);
+                    friendDTOS.add(friendDTO);
                 }
             }
         }
-        friendRequestModel.setAll(userDTOMapper.convert(requests));
+        friendRequestModel.setAll(friendDTOS);
     }
 
     public void initSearchModel() {

@@ -18,7 +18,7 @@ public class User2UserDTOMapper {
     public UserDTO convert(User user){
         for(Friendship fr: friendshipDBRepo.getAll()){
             if(fr.getIdU1() == user.getID() || fr.getIdU2() == user.getID()){
-                return new UserDTO(user.getID(), user.getFirstName(), user.getLastName(), fr.getDate());
+                return new UserDTO(user.getID(), user.getFirstName(), user.getLastName(), fr.getDate(), fr.getStatus());
             }
         }
         return null;

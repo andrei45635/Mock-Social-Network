@@ -57,14 +57,14 @@ public class FriendshipDBRepo implements Repository<Long, Friendship> {
 
     @Override
     public Friendship update(Friendship entity) {
-        String query = "UPDATE friendships SET idu2 = ?, date = ?, status = ? WHERE idu1= ?";
+        String query = "UPDATE friendships SET date = ?, status = ? WHERE idu1= ? and idu2 = ?";
         try (Connection connection = jdbcUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);
         ) {
-            statement.setInt(1, (int) entity.getIdU2());
-            statement.setTimestamp(2, Timestamp.valueOf(entity.getDate()));
-            statement.setString(3, String.valueOf(entity.getStatus()));
-            statement.setInt(4, (int) entity.getIdU1());
+            statement.setTimestamp(1, Timestamp.valueOf(entity.getDate()));
+            statement.setString(2, String.valueOf(entity.getStatus()));
+            statement.setInt(3, (int) entity.getIdU1());
+            statement.setInt(4, (int) entity.getIdU2());
             statement.executeUpdate();
 
         } catch (SQLException e) {

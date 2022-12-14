@@ -1,5 +1,7 @@
 package com.example.lab6_socialnetwork_gui.dto;
 
+import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -8,12 +10,22 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private LocalDateTime date;
+    private FriendshipStatus status;
 
-    public UserDTO(int ID, String firstName, String lastName, LocalDateTime date) {
+    public FriendshipStatus getStatus() {
+        return status;
+    }
+
+    public UserDTO(int ID, String firstName, String lastName, LocalDateTime date, FriendshipStatus status) {
         this.ID = ID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.date = date;
+        this.status = status;
+    }
+
+    public void setStatus(FriendshipStatus status) {
+        this.status = status;
     }
 
     public int getID() {
@@ -51,15 +63,5 @@ public class UserDTO {
     @Override
     public int hashCode() {
         return Objects.hash(ID);
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "ID=" + ID +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", date=" + date +
-                '}';
     }
 }

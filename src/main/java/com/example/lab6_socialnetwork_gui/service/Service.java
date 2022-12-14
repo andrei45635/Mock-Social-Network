@@ -207,27 +207,10 @@ public class Service implements Observable<UserEntityChangeEvent> {
      * @param ID2, int user 2
      */
     public void deleteFriendService(int ID, int ID2) throws IOException {
-        User found1 = null;
-        User found2 = null;
-        for (User u : repo.getAll()) {
-            if (u.getID() == ID) {
-                found1 = u;
-            }
-        }
-
-        for (User u : repo.getAll()) {
-            if (u.getID() == ID2) {
-                found2 = u;
-            }
-        }
-
-        assert found1 != null;
-        found1.getFriends().remove(found2);
-        assert found2 != null;
-        found2.getFriends().remove(found1);
         for(Friendship fr: friendships.getAll()){
             if(fr.getIdU1() == ID && fr.getIdU2() == ID2){
                 friendships.delete(fr);
+                break;
             }
         }
     }
