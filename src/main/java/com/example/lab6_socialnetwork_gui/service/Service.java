@@ -68,6 +68,18 @@ public class Service implements Observable<UserEntityChangeEvent> {
         return repo.findOne(id);
     }
 
+    /***
+     * Withdraws a friend request by deleting it from the Friendships repository
+     * @param friendReq Friendship entity
+     */
+    public void withdrawFriendReq(Friendship friendReq){
+        for(Friendship fr: friendships.getAll()){
+            if(fr.equals(friendReq)){
+                friendships.delete(friendReq);
+            }
+        }
+    }
+
     /**
      * Checks if two users are friends
      * @param u1 user 1

@@ -159,6 +159,23 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
             }
         }
         initSearchModel();
+        initRequestsModel();
+    }
+
+    @FXML
+    private void onWithdrawFriendReq(ActionEvent actionEvent) {
+        UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
+        for(User u: service.getAllService()){
+            if(u.getID() == user.getID()){
+                for(Friendship fr: service.getAllFriendsService()){
+                    if(fr.getIdU1() == u.getID() || fr.getIdU2() == u.getID()){
+                        service.withdrawFriendReq(fr);
+                    }
+                }
+            }
+        }
+        initRequestsModel();
+        initSearchModel();
     }
 
     @Override

@@ -82,6 +82,11 @@
                               <Font size="14.0" />
                            </font>
                         </Button>
+                        <Button fx:id="withdrawFriendReqButton" layoutX="12.0" layoutY="270.0" mnemonicParsing="false" onAction="#onWithdrawFriendReq" text="Withdraw Friend Request">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
                      </children>
                   </AnchorPane>
                </center>
