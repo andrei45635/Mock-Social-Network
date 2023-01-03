@@ -2,8 +2,10 @@ package com.example.lab6_socialnetwork_gui.service;
 
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
+import com.example.lab6_socialnetwork_gui.domain.Message;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
+import com.example.lab6_socialnetwork_gui.repo.database.MessageDBRepo;
 import com.example.lab6_socialnetwork_gui.repo.database.UserDBRepo;
 import com.example.lab6_socialnetwork_gui.utils.event.ChangeEventType;
 import com.example.lab6_socialnetwork_gui.utils.event.UserEntityChangeEvent;
@@ -25,12 +27,14 @@ public class Service implements Observable<UserEntityChangeEvent> {
     private final Validator<User> validator;
     private UserDBRepo repo;
     private FriendshipDBRepo friendships;
+    private MessageDBRepo messageDBRepo;
     private List<Observer<UserEntityChangeEvent>> observers = new ArrayList<>();
 
-    public Service(Validator<User> validator, UserDBRepo repo, FriendshipDBRepo friendships) {
+    public Service(Validator<User> validator, UserDBRepo repo, FriendshipDBRepo friendships, MessageDBRepo messageDBRepo) {
         this.validator = validator;
         this.repo = repo;
         this.friendships = friendships;
+        this.messageDBRepo = messageDBRepo;
     }
 
     /**
@@ -47,6 +51,48 @@ public class Service implements Observable<UserEntityChangeEvent> {
      */
     public List<Friendship> getAllFriendsService() {
         return friendships.getAll();
+    }
+
+    /**
+     * Returns a list of all the messages sent
+     * @return List of messages
+     */
+    public List<Message> getAllMessages(){
+        return messageDBRepo.getAll();
+    }
+
+    /**
+     * Returns all the messages for a given user
+     * @param user the user for which we want to find all the messages
+     * @return List of all the messages for the given user
+     */
+    public List<Message> getAllMessagesForUser(User user){
+        List<Message> messages = new ArrayList<>();
+        for(User u: repo.getAll()){
+            for(Message msg: messageDBRepo.getAll()){
+                if(u.getID() == msg.getSenderID() || u.getID() == msg.getReceiverID()){
+                    messages.add(msg);
+                }
+            }
+        }
+        return messages;
+    }
+
+    public void addMessageService(int senderID, int receiverID, String message) {
+        Message msg = new Message(senderID, receiverID, message);
+        try{
+            messageDBRepo.save(msg);
+        } catch (IOException exc){
+            exc.printStackTrace();
+        }
+    }
+
+    public void deleteMessageService(Message msg){
+        try{
+            messageDBRepo.delete(msg);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -88,9 +134,9 @@ public class Service implements Observable<UserEntityChangeEvent> {
      */
     public boolean isFriendsWith(User u1, User u2){
         for(Friendship fr: friendships.getAll()){
-            if(fr.getIdU1() == u1.getID() && fr.getIdU2() == u2.getID()){
+            if(fr.getIdU1() == u1.getID() && fr.getIdU2() == u2.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED){
                 return true;
-            } else if(fr.getIdU1() == u2.getID() && fr.getIdU2() == u1.getID()){
+            } else if(fr.getIdU1() == u2.getID() && fr.getIdU2() == u1.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED){
                 return true;
             }
         }

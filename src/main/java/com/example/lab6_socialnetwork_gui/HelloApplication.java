@@ -2,6 +2,7 @@ package com.example.lab6_socialnetwork_gui;
 
 import com.example.lab6_socialnetwork_gui.controller.LoginController;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
+import com.example.lab6_socialnetwork_gui.repo.database.MessageDBRepo;
 import com.example.lab6_socialnetwork_gui.repo.database.UserDBRepo;
 import com.example.lab6_socialnetwork_gui.service.Service;
 import com.example.lab6_socialnetwork_gui.validators.UserValidator;
@@ -24,7 +25,7 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
 
         LoginController loginController = fxmlLoader.getController();
-        loginController.setService(new Service(new UserValidator(), new UserDBRepo(), new FriendshipDBRepo()));
+        loginController.setService(new Service(new UserValidator(), new UserDBRepo(), new FriendshipDBRepo(), new MessageDBRepo()));
 
         stage.show();
     }

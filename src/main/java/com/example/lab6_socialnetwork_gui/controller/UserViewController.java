@@ -2,12 +2,18 @@ package com.example.lab6_socialnetwork_gui.controller;
 
 import com.example.lab6_socialnetwork_gui.domain.Friendship;
 import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
+import com.example.lab6_socialnetwork_gui.domain.Message;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.dto.FriendUserDTO;
+import com.example.lab6_socialnetwork_gui.dto.MessageDTO;
+import com.example.lab6_socialnetwork_gui.dto.MessageUserDTO;
 import com.example.lab6_socialnetwork_gui.dto.UserDTO;
+import com.example.lab6_socialnetwork_gui.mapper.Message2MessageDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2FriendUserDTOMapper;
+import com.example.lab6_socialnetwork_gui.mapper.User2MessageUserDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2UserDTOMapper;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
+import com.example.lab6_socialnetwork_gui.repo.database.MessageDBRepo;
 import com.example.lab6_socialnetwork_gui.service.Service;
 import com.example.lab6_socialnetwork_gui.utils.event.UserEntityChangeEvent;
 import com.example.lab6_socialnetwork_gui.utils.observer.Observer;
@@ -22,10 +28,25 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class UserViewController implements Observer<UserEntityChangeEvent> {
+    @FXML
+    private TableView<MessageUserDTO> messageUserTableView;
+    @FXML
+    private ListView<MessageDTO> messageList;
+    @FXML
+    private TableColumn<MessageUserDTO, String> firstNameColumnMessage;
+    @FXML
+    private TableColumn<MessageUserDTO, String> lastNameColumnMessage;
+    @FXML
+    private Button sendMessageButton;
+    @FXML
+    private TextField messageTF;
+    @FXML
+    private Label messageTextLabel;
     //Table Views
     @FXML
     private TableView<UserDTO> friendsTableView;
@@ -41,14 +62,15 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private User loggedInUser;
 
     private final ObservableList<UserDTO> friendsModel = FXCollections.observableArrayList();
-
     private final ObservableList<FriendUserDTO> searchFriendsModel = FXCollections.observableArrayList();
-
     private final ObservableList<UserDTO> friendRequestModel = FXCollections.observableArrayList();
+    private final ObservableList<MessageUserDTO> messageUserModel = FXCollections.observableArrayList();
+    private final ObservableList<MessageDTO> messageDTOSModel = FXCollections.observableArrayList();
 
     private final User2UserDTOMapper userDTOMapper = new User2UserDTOMapper(new FriendshipDBRepo());
-
     private final User2FriendUserDTOMapper user2FriendUserDTOMapper = new User2FriendUserDTOMapper();
+    private final User2MessageUserDTOMapper user2MessageUserDTOMapper = new User2MessageUserDTOMapper();
+    private final Message2MessageDTOMapper message2MessageDTOMapper = new Message2MessageDTOMapper();
 
     //Main page featuring the friends of the logged-in user
     @FXML
@@ -107,6 +129,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         }
         initModel();
         initSearchModel();
+        initMessageModel();
     }
 
     @FXML
@@ -124,6 +147,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         initModel();
         initSearchModel();
         initRequestsModel();
+        initMessageModel();
     }
 
     @FXML
@@ -149,11 +173,11 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         if (user != null) {
             service.addFriendService(loggedInUser.getID(), user.getID());
         }
-        if(user != null){
-            for(Friendship fr: service.getAllFriendsService()){
-                if(loggedInUser.getID() == fr.getIdU1() && user.getID() == fr.getIdU2()){
+        if (user != null) {
+            for (Friendship fr : service.getAllFriendsService()) {
+                if (loggedInUser.getID() == fr.getIdU1() && user.getID() == fr.getIdU2()) {
                     fr.setStatus(FriendshipStatus.PENDING);
-                } else if(loggedInUser.getID() == fr.getIdU2() && user.getID() == fr.getIdU1()){
+                } else if (loggedInUser.getID() == fr.getIdU2() && user.getID() == fr.getIdU1()) {
                     fr.setStatus(FriendshipStatus.PENDING);
                 }
             }
@@ -163,12 +187,41 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     }
 
     @FXML
+    private void onSendMessageButtonClick(ActionEvent actionEvent) {
+        MessageUserDTO user = messageUserTableView.getSelectionModel().getSelectedItem();
+        List<Message> messages = new ArrayList<>();
+        User found = null;
+        if (user != null) {
+            initMessageUser(user, messages);
+
+            String message = messageTF.getText();
+            for(User u: service.getAllService()){
+                if (u.getFirstName().equals(user.getFirstName()) && u.getLastName().equals(user.getLastName())){
+                    found = u;
+                }
+            }
+            assert found != null;
+            service.addMessageService(loggedInUser.getID(), found.getID(), message);
+        }
+    }
+
+    private void initMessageUser(MessageUserDTO user, List<Message> messages) {
+        for (User u : service.getAllService()) {
+            if (u.getFirstName().equals(user.getFirstName()) && u.getLastName().equals(user.getLastName())) {
+                messages = service.getAllMessagesForUser(u);
+            }
+        }
+        messageDTOSModel.setAll(message2MessageDTOMapper.convert(messages));
+        //messageList.setItems(messageDTOSModel);
+    }
+
+    @FXML
     private void onWithdrawFriendReq(ActionEvent actionEvent) {
         UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
-        for(User u: service.getAllService()){
-            if(u.getID() == user.getID()){
-                for(Friendship fr: service.getAllFriendsService()){
-                    if(fr.getIdU1() == u.getID() || fr.getIdU2() == u.getID()){
+        for (User u : service.getAllService()) {
+            if (u.getID() == user.getID()) {
+                for (Friendship fr : service.getAllFriendsService()) {
+                    if (fr.getIdU1() == u.getID() || fr.getIdU2() == u.getID()) {
                         service.withdrawFriendReq(fr);
                     }
                 }
@@ -183,6 +236,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         initModel();
         initSearchModel();
         initRequestsModel();
+        initMessageModel();
     }
 
     public void setService(Service service) {
@@ -191,6 +245,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         initModel();
         initSearchModel();
         initRequestsModel();
+        initMessageModel();
     }
 
     @FXML
@@ -222,6 +277,23 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
 
         searchFirstNameTF.textProperty().addListener(f -> userFilters());
         searchLastNameTF.textProperty().addListener(f -> userFilters());
+
+        firstNameColumnMessage.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastNameColumnMessage.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+
+        messageUserTableView.setItems(messageUserModel);
+        messageList.setItems(messageDTOSModel);
+    }
+
+    public void initMessageModel() {
+        List<User> users = service.getAllService();
+        List<User> friends = new ArrayList<>();
+        for (User u : users) {
+            if (!u.equals(loggedInUser) && service.isFriendsWith(u, loggedInUser)) {
+                friends.add(u);
+            }
+        }
+        messageUserModel.setAll(user2MessageUserDTOMapper.convert(friends));
     }
 
     public void initRequestsModel() {
@@ -250,7 +322,7 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         List<User> users = service.getAllService();
         List<User> others = new ArrayList<>();
         for (User o : users) {
-            if(!o.equals(loggedInUser) && !service.isFriendsWith(o, loggedInUser)){
+            if (!o.equals(loggedInUser) && !service.isFriendsWith(o, loggedInUser)) {
                 others.add(o);
             }
         }
