@@ -13,7 +13,6 @@ import com.example.lab6_socialnetwork_gui.mapper.User2FriendUserDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2MessageUserDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2UserDTOMapper;
 import com.example.lab6_socialnetwork_gui.repo.database.FriendshipDBRepo;
-import com.example.lab6_socialnetwork_gui.repo.database.MessageDBRepo;
 import com.example.lab6_socialnetwork_gui.service.Service;
 import com.example.lab6_socialnetwork_gui.utils.event.UserEntityChangeEvent;
 import com.example.lab6_socialnetwork_gui.utils.observer.Observer;
@@ -21,23 +20,27 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
     private TableView<MessageUserDTO> messageUserTableView;
+    //@FXML
+    //private ListView<MessageDTO> messageList;
     @FXML
-    private ListView<MessageDTO> messageList;
+    private ListView<String> messageList;
     @FXML
     private TableColumn<MessageUserDTO, String> firstNameColumnMessage;
     @FXML
@@ -66,7 +69,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private final ObservableList<FriendUserDTO> searchFriendsModel = FXCollections.observableArrayList();
     private final ObservableList<UserDTO> friendRequestModel = FXCollections.observableArrayList();
     private final ObservableList<MessageUserDTO> messageUserModel = FXCollections.observableArrayList();
-    private final ObservableList<MessageDTO> messageDTOSModel = FXCollections.observableArrayList();
+    //private final ObservableList<MessageDTO> messageDTOSModel = FXCollections.observableArrayList();
+    private final ObservableList<String> messageDTOSModel = FXCollections.observableArrayList();
 
     private final User2UserDTOMapper userDTOMapper = new User2UserDTOMapper(new FriendshipDBRepo());
     private final User2FriendUserDTOMapper user2FriendUserDTOMapper = new User2FriendUserDTOMapper();
@@ -198,13 +202,23 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
                 }
             }
             List<Message> msgs = service.getMessagesForTwoFriends(loggedInUser, found);
-            messageDTOSModel.setAll(message2MessageDTOMapper.convert(msgs));
-            messageList.setItems(messageDTOSModel);
+            for(int i = 0; i < msgs.size(); i++){
+                messageDTOSModel.setAll(msgs.get(i).getMessage());
+                messageList.setItems(messageDTOSModel);
+            }
             String message = messageTF.getText();
             assert found != null;
             service.addMessageService(loggedInUser.getID(), found.getID(), message);
-            System.out.printf(message);
-            messageList.refresh();
+//            messageDTOSModel.setAll(message2MessageDTOMapper.convert(msgs));
+//            messageList.setItems(messageDTOSModel);
+//            messageList.refresh();
+//            String message = messageTF.getText();
+//            assert found != null;
+//            service.addMessageService(loggedInUser.getID(), found.getID(), message);
+//            messageDTOSModel.setAll(message2MessageDTOMapper.convert(msgs));
+//            messageList.setItems(messageDTOSModel);
+//            System.out.printf(message);
+//            messageList.refresh();
         }
     }
 
@@ -354,5 +368,31 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         List<User> users = service.getAllService();
         List<FriendUserDTO> friendUsers = user2FriendUserDTOMapper.convert(users);
         searchFriendsModel.setAll(friendUsers.stream().filter(predicateResult).collect(Collectors.toList()));
+    }
+
+    @FXML
+    private void onClickOpenChat(ActionEvent actionEvent) throws IOException {
+        MessageUserDTO user = messageUserTableView.getSelectionModel().getSelectedItem();
+        User clickedUser = null;
+        if (user != null) {
+            for (User u : service.getAllService()) {
+                if (u.getFirstName().equals(user.getFirstName()) && u.getLastName().equals(user.getLastName())) {
+                    clickedUser = u;
+                }
+            }
+        }
+        ///com/example/lab6_socialnetwork_gui/
+        System.out.println(getClass().getResource("resources/com/example/lab6_socialnetwork_gui/chat-window.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/chat-window.fxml"));
+        Parent root = loader.load();
+        ChatWindowController chatWindowController = loader.getController();
+        chatWindowController.setLoggedInUser(loggedInUser);
+        chatWindowController.setClickedUser(clickedUser);
+        chatWindowController.setChatLabel(loggedInUser, clickedUser);
+        chatWindowController.setService(service);
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root, 600, 400));
+        stage.setTitle("Hello!");
+        stage.show();
     }
 }
