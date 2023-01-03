@@ -5,10 +5,8 @@ import com.example.lab6_socialnetwork_gui.domain.FriendshipStatus;
 import com.example.lab6_socialnetwork_gui.domain.Message;
 import com.example.lab6_socialnetwork_gui.domain.User;
 import com.example.lab6_socialnetwork_gui.dto.FriendUserDTO;
-import com.example.lab6_socialnetwork_gui.dto.MessageDTO;
 import com.example.lab6_socialnetwork_gui.dto.MessageUserDTO;
 import com.example.lab6_socialnetwork_gui.dto.UserDTO;
-import com.example.lab6_socialnetwork_gui.mapper.Message2MessageDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2FriendUserDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2MessageUserDTOMapper;
 import com.example.lab6_socialnetwork_gui.mapper.User2UserDTOMapper;
@@ -20,13 +18,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,21 +29,7 @@ import java.util.stream.Collectors;
 
 public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
-    private TableView<MessageUserDTO> messageUserTableView;
-    //@FXML
-    //private ListView<MessageDTO> messageList;
-    @FXML
-    private ListView<String> messageList;
-    @FXML
-    private TableColumn<MessageUserDTO, String> firstNameColumnMessage;
-    @FXML
-    private TableColumn<MessageUserDTO, String> lastNameColumnMessage;
-    @FXML
-    private Button sendMessageButton;
-    @FXML
     private TextField messageTF;
-    @FXML
-    private Label messageTextLabel;
     //Table Views
     @FXML
     private TableView<UserDTO> friendsTableView;
@@ -58,6 +37,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private TableView<UserDTO> requestsTableView;
     @FXML
     private TableView<FriendUserDTO> searchFriendTableView;
+    @FXML
+    private TableView<MessageUserDTO> messageUserTableView;
 
     //Service
     private Service service;
@@ -69,13 +50,11 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private final ObservableList<FriendUserDTO> searchFriendsModel = FXCollections.observableArrayList();
     private final ObservableList<UserDTO> friendRequestModel = FXCollections.observableArrayList();
     private final ObservableList<MessageUserDTO> messageUserModel = FXCollections.observableArrayList();
-    //private final ObservableList<MessageDTO> messageDTOSModel = FXCollections.observableArrayList();
     private final ObservableList<String> messageDTOSModel = FXCollections.observableArrayList();
 
     private final User2UserDTOMapper userDTOMapper = new User2UserDTOMapper(new FriendshipDBRepo());
     private final User2FriendUserDTOMapper user2FriendUserDTOMapper = new User2FriendUserDTOMapper();
     private final User2MessageUserDTOMapper user2MessageUserDTOMapper = new User2MessageUserDTOMapper();
-    private final Message2MessageDTOMapper message2MessageDTOMapper = new Message2MessageDTOMapper();
 
     //Main page featuring the friends of the logged-in user
     @FXML
@@ -118,6 +97,14 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     private TextField searchFirstNameTF;
     @FXML
     private TextField searchLastNameTF;
+
+    // The messages page
+    @FXML
+    private ListView<String> messageList;
+    @FXML
+    private TableColumn<MessageUserDTO, String> firstNameColumnMessage;
+    @FXML
+    private TableColumn<MessageUserDTO, String> lastNameColumnMessage;
 
     @FXML
     private void onRemoveFriendClick(ActionEvent actionEvent) throws IOException {
