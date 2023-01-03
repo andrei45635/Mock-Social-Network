@@ -192,6 +192,22 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     }
 
     @FXML
+    private void onClickRefresh(ActionEvent actionEvent) {
+        MessageUserDTO clickedUser = messageUserTableView.getSelectionModel().getSelectedItem();
+        User found = null;
+        for(User u: service.getAllService()){
+            if (u.getFirstName().equals(clickedUser.getFirstName()) && u.getLastName().equals(clickedUser.getLastName())){
+                found = u;
+            }
+        }
+        List<Message> msgs = service.getAllMessagesForUser(found);
+        for (Message msg : msgs) {
+            messageDTOSModel.setAll(msg.getMessage());
+            messageList.setItems(messageDTOSModel);
+        }
+    }
+
+    @FXML
     private void onSendMessageButtonClick(ActionEvent actionEvent) {
         MessageUserDTO user = messageUserTableView.getSelectionModel().getSelectedItem();
         User found = null;
@@ -202,23 +218,13 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
                 }
             }
             List<Message> msgs = service.getMessagesForTwoFriends(loggedInUser, found);
-            for(int i = 0; i < msgs.size(); i++){
-                messageDTOSModel.setAll(msgs.get(i).getMessage());
+            for (Message msg : msgs) {
+                messageDTOSModel.setAll(msg.getMessage());
                 messageList.setItems(messageDTOSModel);
             }
             String message = messageTF.getText();
             assert found != null;
             service.addMessageService(loggedInUser.getID(), found.getID(), message);
-//            messageDTOSModel.setAll(message2MessageDTOMapper.convert(msgs));
-//            messageList.setItems(messageDTOSModel);
-//            messageList.refresh();
-//            String message = messageTF.getText();
-//            assert found != null;
-//            service.addMessageService(loggedInUser.getID(), found.getID(), message);
-//            messageDTOSModel.setAll(message2MessageDTOMapper.convert(msgs));
-//            messageList.setItems(messageDTOSModel);
-//            System.out.printf(message);
-//            messageList.refresh();
         }
     }
 
@@ -368,31 +374,5 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         List<User> users = service.getAllService();
         List<FriendUserDTO> friendUsers = user2FriendUserDTOMapper.convert(users);
         searchFriendsModel.setAll(friendUsers.stream().filter(predicateResult).collect(Collectors.toList()));
-    }
-
-    @FXML
-    private void onClickOpenChat(ActionEvent actionEvent) throws IOException {
-        MessageUserDTO user = messageUserTableView.getSelectionModel().getSelectedItem();
-        User clickedUser = null;
-        if (user != null) {
-            for (User u : service.getAllService()) {
-                if (u.getFirstName().equals(user.getFirstName()) && u.getLastName().equals(user.getLastName())) {
-                    clickedUser = u;
-                }
-            }
-        }
-        ///com/example/lab6_socialnetwork_gui/
-        System.out.println(getClass().getResource("resources/com/example/lab6_socialnetwork_gui/chat-window.fxml"));
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/lab6_socialnetwork_gui/chat-window.fxml"));
-        Parent root = loader.load();
-        ChatWindowController chatWindowController = loader.getController();
-        chatWindowController.setLoggedInUser(loggedInUser);
-        chatWindowController.setClickedUser(clickedUser);
-        chatWindowController.setChatLabel(loggedInUser, clickedUser);
-        chatWindowController.setService(service);
-        Stage stage = new Stage();
-        stage.setScene(new Scene(root, 600, 400));
-        stage.setTitle("Hello!");
-        stage.show();
     }
 }

@@ -39,6 +39,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns a list with all the users
+     *
      * @return List of Users
      */
     public List<User> getAllService() {
@@ -47,6 +48,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns a list with all the friends
+     *
      * @return List of Friends
      */
     public List<Friendship> getAllFriendsService() {
@@ -55,52 +57,68 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns a list of all the messages sent
+     *
      * @return List of messages
      */
-    public List<Message> getAllMessages(){
+    public List<Message> getAllMessages() {
         return messageDBRepo.getAll();
     }
 
     /**
      * Returns all the messages for a given user
+     *
      * @param user the user for which we want to find all the messages
      * @return List of all the messages for the given user
      */
-    public List<Message> getAllMessagesForUser(User user){
+    public List<Message> getAllMessagesForUser(User user) {
         List<Message> messages = new ArrayList<>();
-        for(User u: repo.getAll()){
-            for(Message msg: messageDBRepo.getAll()){
-                if(user.getID() == msg.getReceiverID() && u.getID() == msg.getSenderID()){
-                    messages.add(msg);
-                }
-            }
-      }
-        return messages;
-    }
-
-    public List<Message> getMessagesForTwoFriends(User sender, User receiver){
-        List<Message> messages = new ArrayList<>();
-        for(Message msg: messageDBRepo.getAll()){
-            if(msg.getSenderID() == sender.getID() && msg.getReceiverID() == receiver.getID()){
-                messages.add(msg);
-            } else if (msg.getSenderID() == receiver.getID() && msg.getReceiverID() == sender.getID()){
+        for (Message msg : messageDBRepo.getAll()) {
+            if (user.getID() == msg.getReceiverID() || user.getID() == msg.getSenderID()) {
                 messages.add(msg);
             }
         }
         return messages;
     }
 
+    /**
+     * Returns a list of all the messages between two friends
+     * @param sender sender
+     * @param receiver receiver
+     * @return List of Messages
+     */
+    public List<Message> getMessagesForTwoFriends(User sender, User receiver) {
+        List<Message> messages = new ArrayList<>();
+        for (Message msg : messageDBRepo.getAll()) {
+            if (msg.getSenderID() == sender.getID() && msg.getReceiverID() == receiver.getID()) {
+                messages.add(msg);
+            } else if (msg.getSenderID() == receiver.getID() && msg.getReceiverID() == sender.getID()) {
+                messages.add(msg);
+            }
+        }
+        return messages;
+    }
+
+    /**
+     * Adds a message to the service
+     * @param senderID the ID of the sender
+     * @param receiverID the ID of the receiver
+     * @param message the message
+     */
     public void addMessageService(int senderID, int receiverID, String message) {
         Message msg = new Message(senderID, receiverID, message);
-        try{
+        try {
             messageDBRepo.save(msg);
-        } catch (IOException exc){
+        } catch (IOException exc) {
             exc.printStackTrace();
         }
     }
 
-    public void deleteMessageService(Message msg){
-        try{
+    /**
+     * Deletes a message
+     * @param msg the message entity
+     */
+    public void deleteMessageService(Message msg) {
+        try {
             messageDBRepo.delete(msg);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -109,6 +127,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Checks if a user with the given email and passwd exists in the database
+     *
      * @param email  String
      * @param passwd String
      * @return true if the user exists, false otherwise
@@ -119,6 +138,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns a User based on the ID
+     *
      * @param id int
      * @return the User if the ID is valid, null otherwise
      */
@@ -130,9 +150,9 @@ public class Service implements Observable<UserEntityChangeEvent> {
      * Withdraws a friend request by deleting it from the Friendships repository
      * @param friendReq Friendship entity
      */
-    public void withdrawFriendReq(Friendship friendReq){
-        for(Friendship fr: friendships.getAll()){
-            if(fr.equals(friendReq)){
+    public void withdrawFriendReq(Friendship friendReq) {
+        for (Friendship fr : friendships.getAll()) {
+            if (fr.equals(friendReq)) {
                 friendships.delete(friendReq);
             }
         }
@@ -140,15 +160,16 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Checks if two users are friends
+     *
      * @param u1 user 1
      * @param u2 user 2
      * @return true if the users are friends, false otherwise
      */
-    public boolean isFriendsWith(User u1, User u2){
-        for(Friendship fr: friendships.getAll()){
-            if(fr.getIdU1() == u1.getID() && fr.getIdU2() == u2.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED){
+    public boolean isFriendsWith(User u1, User u2) {
+        for (Friendship fr : friendships.getAll()) {
+            if (fr.getIdU1() == u1.getID() && fr.getIdU2() == u2.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED) {
                 return true;
-            } else if(fr.getIdU1() == u2.getID() && fr.getIdU2() == u1.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED){
+            } else if (fr.getIdU1() == u2.getID() && fr.getIdU2() == u1.getID() && fr.getStatus() == FriendshipStatus.ACCEPTED) {
                 return true;
             }
         }
@@ -158,6 +179,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
     /**
      * Finds all the friends of a user
      * loggeInUser.getFriends() (the list of friends) is filled with the friends of the aforementioned user
+     *
      * @param loggedInUser the user
      */
     public void findUserFriends(User loggedInUser) {
@@ -176,7 +198,8 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Finds a user based on their email and password
-     * @param email String
+     *
+     * @param email  String
      * @param passwd String
      * @return the User or null if the email and password don't exist
      */
@@ -229,6 +252,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * The user with the ID ID becomes friends with the user with the ID ID2
+     *
      * @param ID  int, user 1
      * @param ID2 int, user 2
      */
@@ -264,6 +288,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Accepts a friendship
+     *
      * @param fr Friendship
      */
     public void acceptFriendship(Friendship fr) {
@@ -273,12 +298,13 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * The user with the ID ID removes his friendship with the user with the ID ID2
+     *
      * @param ID   int, user 1
      * @param ID2, int user 2
      */
     public void deleteFriendService(int ID, int ID2) throws IOException {
-        for(Friendship fr: friendships.getAll()){
-            if(fr.getIdU1() == ID && fr.getIdU2() == ID2){
+        for (Friendship fr : friendships.getAll()) {
+            if (fr.getIdU1() == ID && fr.getIdU2() == ID2) {
                 friendships.delete(fr);
                 break;
             }
@@ -287,6 +313,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * DFS on a copy of the List of users
+     *
      * @param copy List of users
      */
     public void DFS(List<User> copy) {
@@ -305,6 +332,7 @@ public class Service implements Observable<UserEntityChangeEvent> {
 
     /**
      * Returns the number of connected components in the network
+     *
      * @return int, the number of connected components
      */
     public int connectedCommunities() {
