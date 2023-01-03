@@ -70,9 +70,21 @@ public class Service implements Observable<UserEntityChangeEvent> {
         List<Message> messages = new ArrayList<>();
         for(User u: repo.getAll()){
             for(Message msg: messageDBRepo.getAll()){
-                if(u.getID() == msg.getSenderID() || u.getID() == msg.getReceiverID()){
+                if(user.getID() == msg.getReceiverID() && u.getID() == msg.getSenderID()){
                     messages.add(msg);
                 }
+            }
+      }
+        return messages;
+    }
+
+    public List<Message> getMessagesForTwoFriends(User sender, User receiver){
+        List<Message> messages = new ArrayList<>();
+        for(Message msg: messageDBRepo.getAll()){
+            if(msg.getSenderID() == sender.getID() && msg.getReceiverID() == receiver.getID()){
+                messages.add(msg);
+            } else if (msg.getSenderID() == receiver.getID() && msg.getReceiverID() == sender.getID()){
+                messages.add(msg);
             }
         }
         return messages;

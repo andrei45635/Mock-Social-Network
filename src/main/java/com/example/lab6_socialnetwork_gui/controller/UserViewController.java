@@ -23,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -189,30 +190,22 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
     private void onSendMessageButtonClick(ActionEvent actionEvent) {
         MessageUserDTO user = messageUserTableView.getSelectionModel().getSelectedItem();
-        List<Message> messages = new ArrayList<>();
         User found = null;
         if (user != null) {
-            initMessageUser(user, messages);
-
-            String message = messageTF.getText();
             for(User u: service.getAllService()){
                 if (u.getFirstName().equals(user.getFirstName()) && u.getLastName().equals(user.getLastName())){
                     found = u;
                 }
             }
+            List<Message> msgs = service.getMessagesForTwoFriends(loggedInUser, found);
+            messageDTOSModel.setAll(message2MessageDTOMapper.convert(msgs));
+            messageList.setItems(messageDTOSModel);
+            String message = messageTF.getText();
             assert found != null;
             service.addMessageService(loggedInUser.getID(), found.getID(), message);
+            System.out.printf(message);
+            messageList.refresh();
         }
-    }
-
-    private void initMessageUser(MessageUserDTO user, List<Message> messages) {
-        for (User u : service.getAllService()) {
-            if (u.getFirstName().equals(user.getFirstName()) && u.getLastName().equals(user.getLastName())) {
-                messages = service.getAllMessagesForUser(u);
-            }
-        }
-        messageDTOSModel.setAll(message2MessageDTOMapper.convert(messages));
-        //messageList.setItems(messageDTOSModel);
     }
 
     @FXML
