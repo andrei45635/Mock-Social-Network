@@ -178,6 +178,19 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         initRequestsModel();
     }
 
+    private void extractMessages(List<Message> msgs) {
+        List<String> messages = new ArrayList<>();
+        for (Message msg : msgs) {
+            if(loggedInUser.getID() == msg.getReceiverID()) {
+                messages.add("\t\t (You) " + msg.getMessage());
+            } else {
+                messages.add(msg.getMessage());
+            }
+        }
+        messageDTOSModel.setAll(messages);
+        messageList.setItems(messageDTOSModel);
+    }
+
     @FXML
     private void onClickRefresh(ActionEvent actionEvent) {
         MessageUserDTO clickedUser = messageUserTableView.getSelectionModel().getSelectedItem();
@@ -187,11 +200,8 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
                 found = u;
             }
         }
-        List<Message> msgs = service.getAllMessagesForUser(found);
-        for (Message msg : msgs) {
-            messageDTOSModel.setAll(msg.getMessage());
-            messageList.setItems(messageDTOSModel);
-        }
+        List<Message> msg = service.getMessagesForTwoFriends(loggedInUser, found);
+        extractMessages(msg);
     }
 
     @FXML
@@ -204,18 +214,11 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
                     found = u;
                 }
             }
-            List<Message> msgs = service.getMessagesForTwoFriends(loggedInUser, found);
-            List<String> messages = new ArrayList<>();
-            for (Message msg : msgs) {
-                messages.add(msg.getMessage());
-//                messageDTOSModel.setAll(msg.getMessage());
-//                messageList.setItems(messageDTOSModel);
-            }
-            messageDTOSModel.setAll(messages);
-            messageList.setItems(messageDTOSModel);
             String message = messageTF.getText();
             assert found != null;
             service.addMessageService(loggedInUser.getID(), found.getID(), message);
+            List<Message> msgs = service.getMessagesForTwoFriends(loggedInUser, found);
+            extractMessages(msgs);
         }
     }
 
