@@ -164,8 +164,6 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
         FriendUserDTO user = searchFriendTableView.getSelectionModel().getSelectedItem();
         if (user != null) {
             service.addFriendService(loggedInUser.getID(), user.getID());
-        }
-        if (user != null) {
             for (Friendship fr : service.getAllFriendsService()) {
                 if (loggedInUser.getID() == fr.getIdU1() && user.getID() == fr.getIdU2()) {
                     fr.setStatus(FriendshipStatus.PENDING);
@@ -225,13 +223,9 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
     @FXML
     private void onWithdrawFriendReq(ActionEvent actionEvent) {
         UserDTO user = requestsTableView.getSelectionModel().getSelectedItem();
-        for (User u : service.getAllService()) {
-            if (u.getID() == user.getID()) {
-                for (Friendship fr : service.getAllFriendsService()) {
-                    if (fr.getIdU1() == u.getID() || fr.getIdU2() == u.getID()) {
-                        service.withdrawFriendReq(fr);
-                    }
-                }
+        for(Friendship fr: service.getAllFriendsService()){
+            if((fr.getIdU1() == loggedInUser.getID() && fr.getIdU2() == user.getID())){
+                service.withdrawFriendReq(fr);
             }
         }
         initRequestsModel();
