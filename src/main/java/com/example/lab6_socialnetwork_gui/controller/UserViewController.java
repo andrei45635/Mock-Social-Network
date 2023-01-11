@@ -205,10 +205,14 @@ public class UserViewController implements Observer<UserEntityChangeEvent> {
                 }
             }
             List<Message> msgs = service.getMessagesForTwoFriends(loggedInUser, found);
+            List<String> messages = new ArrayList<>();
             for (Message msg : msgs) {
-                messageDTOSModel.setAll(msg.getMessage());
-                messageList.setItems(messageDTOSModel);
+                messages.add(msg.getMessage());
+//                messageDTOSModel.setAll(msg.getMessage());
+//                messageList.setItems(messageDTOSModel);
             }
+            messageDTOSModel.setAll(messages);
+            messageList.setItems(messageDTOSModel);
             String message = messageTF.getText();
             assert found != null;
             service.addMessageService(loggedInUser.getID(), found.getID(), message);

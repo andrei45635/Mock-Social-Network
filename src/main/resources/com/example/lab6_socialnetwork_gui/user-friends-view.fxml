@@ -157,8 +157,7 @@
                               </Button>
                               <TextField fx:id="messageTF" layoutX="8.0" layoutY="92.0" />
                               <Label fx:id="messageTextLabel" layoutX="14.0" layoutY="67.0" text="Message" />
-                              <Button fx:id="openChatWindowButton" layoutX="23.0" layoutY="203.0" mnemonicParsing="false" onAction="#onClickOpenChat" text="Open Chat Window" />
-                              <Button fx:id="refreshButton" layoutX="50.0" layoutY="254.0" mnemonicParsing="false" onAction="#onClickRefresh" text="Refresh">
+                              <Button fx:id="refreshButton" layoutX="51.0" layoutY="197.0" mnemonicParsing="false" onAction="#onClickRefresh" text="Refresh">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
