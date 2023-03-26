@@ -9,3 +9,4 @@
   <li> Send friend request </li>
   <li> Accept/Reject friend request </li>
   <li> Send message </li>
+</ul>
